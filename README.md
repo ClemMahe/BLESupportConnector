@@ -1,2 +1,2 @@
 # BLESupportConnector
-Working recently on a BLE project, and facing lot of undocumented issues, this project goal is to provide a stable connection.
+Working recently on a BLE project, and facing problems with Android BLE stack, this project goal is to provide a stable connection by adding well-known workarounds and not well-known workarounds.
