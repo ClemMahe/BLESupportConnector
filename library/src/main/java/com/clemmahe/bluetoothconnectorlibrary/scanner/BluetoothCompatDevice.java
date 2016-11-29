@@ -1,25 +1,25 @@
-package com.clemmahe.bluetoothconnectorlibrary.peripheral;
+package com.clemmahe.bluetoothconnectorlibrary.scanner;
 
 import android.bluetooth.BluetoothDevice;
 
 /**
- * BlePeripheral element
+ * BluetoothCompatDevice element
  * Created by clem on 24/11/2016.
  */
 
-public class BlePeripheral {
+public class BluetoothCompatDevice {
 
     private BluetoothDevice mBluetoothDevice;
     private int mPeripheralRssi;
     private byte[] mPeripheralRecord;
 
     /**
-     * Constructor of BlePeripheral
+     * Constructor of BluetoothCompatDevice
      * @param device BluetoothDevice
      * @param rssi rssi
      * @param record record
      */
-    public BlePeripheral(final BluetoothDevice device, final int rssi, final byte[] record){
+    public BluetoothCompatDevice(final BluetoothDevice device, final int rssi, final byte[] record){
         this.mBluetoothDevice = device;
         this.mPeripheralRssi = rssi;
         this.mPeripheralRecord = record;

@@ -2,6 +2,7 @@ package com.clemmahe.bluetoothconnectorlibrary.baseactivity;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -120,8 +121,13 @@ public abstract class BlePermissionsActivity extends AppCompatActivity {
      * @return boolean result
      */
     private boolean checkBluetoothEnabled() {
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return mBluetoothAdapter.isEnabled();
+        boolean bluetoothEnabled = false;
+        BluetoothManager manager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter mBluetoothAdapter = manager.getAdapter();
+        if(mBluetoothAdapter!=null && mBluetoothAdapter.isEnabled()){
+            bluetoothEnabled = true;
+        }
+        return bluetoothEnabled;
     }
 
 
