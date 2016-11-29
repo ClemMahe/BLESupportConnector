@@ -3,11 +3,8 @@ package com.clemmahe.bluetoothconnectorlibrary.scanner;
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Context;
 import android.os.Build;
-
-import java.util.UUID;
 
 /**
  * JellyBeanScanner for Android 4.4 & also 4.3 (Jellybean)

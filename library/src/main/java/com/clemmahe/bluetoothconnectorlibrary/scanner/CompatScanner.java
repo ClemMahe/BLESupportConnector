@@ -14,11 +14,9 @@ import android.os.Handler;
 public abstract class CompatScanner {
 
 
-    private static final long PERIOD_SCAN_MS = 3000;
-
-
     private Context mContext;
     private Handler mScanHandler;
+    private long mPeriodScan;
 
     protected BluetoothManager mBluetoothManager;
     protected BluetoothAdapter mBluetoothAdapter;
@@ -71,15 +69,22 @@ public abstract class CompatScanner {
      * @param callback ScanCompatCallback
      */
     public void startCompatScan(final ScanCompatCallback callback,
-                                long periodScanMs, long pauseBetweenScanMs){
+                                long periodScanMs){
+        //Start scan
+        this.mPeriodScan = periodScanMs;
         this.mScanCallback = callback;
-        this.startScan();
-        this.mScanHandler.post(scanRunnable);
+
+        if(!isScanning) {
+            this.startScan();
+            this.mScanHandler.post(scanRunnable);
+        }
     }
 
 
     public void stopCompatScan(){
+        //Stop scan
         this.mScanHandler.removeCallbacks(scanRunnable);
+        stopScan();
     }
 
 
@@ -96,7 +101,7 @@ public abstract class CompatScanner {
                     stopScan();
                     mScanHandler.post(scanRunnable);
                 }
-            },PERIOD_SCAN_MS);
+            },mPeriodScan);
         }
     };
 
