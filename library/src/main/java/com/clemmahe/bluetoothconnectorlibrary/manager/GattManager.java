@@ -4,10 +4,12 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.clemmahe.bluetoothconnectorlibrary.logger.Logger;
 import com.clemmahe.bluetoothconnectorlibrary.scanner.BluetoothCompatDevice;
 
 import java.lang.reflect.Method;
@@ -21,7 +23,19 @@ public class GattManager {
 
     private Context mContext;
     private Handler uiHandler;
-    private BluetoothGatt mGatt;
+
+    //Connection state
+    private static boolean isConnected;
+
+    //Single Gatt instance at any time
+    private static BluetoothGatt mGatt;
+
+    //Single instance of GattCallback
+    private static BluetoothGattCallback mGattCallback;
+
+    //Listeners
+    private static IConnectionListener mConnectionListener;
+
 
 
     /**
@@ -37,11 +51,13 @@ public class GattManager {
     /**
      * Connect Gatt
      * @param device BluetoothCompatDevice
+     * @param connectionListener IConnectionListener
      */
-    public void connectGatt(final BluetoothCompatDevice device){
+    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener){
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
+                mConnectionListener = connectionListener;
                 mGatt = device.getBluetoothDevice().connectGatt(mContext, false, mGattCallback);
             }
         });
@@ -56,6 +72,8 @@ public class GattManager {
             @Override
             public void run() {
                 if(mGatt!=null){
+                    isConnected = false;
+                    //Disconnect
                     refreshDeviceCache(mGatt);
                     mGatt.disconnect();
                     mGatt.close();
@@ -65,16 +83,54 @@ public class GattManager {
         });
     }
 
+    /**
+     * Discover services
+     */
+    private void discoverServices(){
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mGatt.discoverServices();
+            }
+        });
+    }
 
-    private BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+    /**
+     * Get Gatt callback - Single instance
+     * @return BluetoothGattCallback
+     */
+    private BluetoothGattCallback mGattManagerCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
+
+            //Connection state
+            if(newState == BluetoothProfile.STATE_CONNECTING){
+                if(mConnectionListener!=null) mConnectionListener.onConnecting();
+            }else if(newState == BluetoothProfile.STATE_CONNECTED){
+                isConnected = true;
+                //Discover services
+                discoverServices();
+                if(mConnectionListener!=null) mConnectionListener.onConnected();
+                Logger.w("GattManager.STATE_CONNECTED");
+            }else if(newState == BluetoothProfile.STATE_DISCONNECTING){
+                if(mConnectionListener!=null) mConnectionListener.onDisconnecting();
+                isConnected = false;
+            }else if(newState == BluetoothProfile.STATE_DISCONNECTED){
+                if(mConnectionListener!=null) mConnectionListener.onDisconnected();
+                //Assure if isConnected that gatt is disconnected
+                Logger.w("GattManager.STATE_DISCONNECTED");
+                if(isConnected){
+                    disconnectGatt();
+                }
+            }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+            if(mConnectionListener!=null) mConnectionListener.onServicesDiscovered();
+            Logger.w("GattManager.SERVICES_DISCOVERED");
         }
 
         @Override
@@ -127,14 +183,15 @@ public class GattManager {
     private boolean refreshDeviceCache(BluetoothGatt gatt){
         try {
             BluetoothGatt localBluetoothGatt = gatt;
-            Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+            Method localMethod = localBluetoothGatt.getClass().getMethod("refresh");
             if (localMethod != null) {
-                boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+                boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt)).booleanValue();
                 return bool;
             }
         }
         catch (Exception localException) {
-            //Cannot call methods & cannot refresh
+            //Cannot call methods & cannot refresh - Exception is generic but it's a workaround anyway,
+            //this method is used widely and should not be
         }
         return false;
     }

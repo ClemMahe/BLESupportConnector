@@ -11,13 +11,14 @@ import com.clemmahe.bluetoothconnectorlibrary.scanner.ScanCompatCallback;
  * Created by clem on 29/11/2016.
  */
 
-public class BleManager {
+public class BleManager{
 
     private static final long DEFAULT_SCAN_PERIOD = 2000;
 
     private Context mContext;
     private CompatScanner mCompatScanner;
     private GattManager mGattManager;
+
 
     /**
      * Constructor
@@ -50,9 +51,10 @@ public class BleManager {
      * Connect to device
      * @param device
      */
-    public void connectToDevice(final BluetoothCompatDevice device){
-
+    public void connectToDevice(final BluetoothCompatDevice device, final IConnectionListener connectionListener){
+        this.mGattManager.connectGatt(device,connectionListener);
     }
+
 
 
 }
