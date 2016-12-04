@@ -99,3 +99,10 @@ private IConnectionListener mConnectionListener = new IConnectionListener() {
 ## Sample 
 
 A sample app is included as a module of the project.
+
+## Issue 
+
+If you have any issue, don't hesitate to create tickets. If its related to scanning peripherals I may not have any solution.
+I experienced some phones having difficulties scanning BLE peripherals : 
+- Samsung Galaxy Note3 Android 4.4
+- Samsung Galaxy S4 mini Android 4.4 (aside S4 Android 4.4 working well ...) 
