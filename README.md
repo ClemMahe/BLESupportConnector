@@ -59,7 +59,7 @@ private ScanCompatCallback mScanCallback = new ScanCompatCallback() {
 
 3) Connect 
 
-Connection will be using <b>BluetoothCompatDevice<b/> object. It contains android bluetooth class : <b>BluetoothDevice</b>, rssi and scanRecord.
+Connection will be using <b>BluetoothCompatDevice</b> object. It contains android bluetooth class : <b>BluetoothDevice</b>, rssi and scanRecord.
 Note that you don't have to bother with calling "discoverServices", it will be done inside the library when connected.
 
 ```java 
