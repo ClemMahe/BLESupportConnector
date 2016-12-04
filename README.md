@@ -16,7 +16,8 @@ When Bluetooh is ready :
 ```java 
 BleManager bleManager = BleManager.getInstance(getApplicationContext());
 
-/*You might want to assure to close bleManger when finish. Otherwise next scan may fail as device will be conneted & you may get "GATT errors"/
+/*You might want to assure to close bleManger when finish. Otherwise next scan may fail as device 
+will be conneted & you may get "GATT errors" */
 @Override
 protected void onDestroy() {
     super.onDestroy();
