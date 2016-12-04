@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.clemmahe.blesupportconnector.R;
 import com.clemmahe.bluetoothconnectorlibrary.baseactivity.BlePermissionsActivity;
 
-public class ListPeripherals extends BlePermissionsActivity {
+public class DetailPeripheralActivity extends BlePermissionsActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

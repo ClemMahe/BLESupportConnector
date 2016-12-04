@@ -23,16 +23,26 @@ public class JellyBeanScanner extends CompatScanner{
     }
 
     @Override
-    public void stopScan() {
+    public boolean stopScan() {
         isScanning = false;
         mScanCallback.onScanEnded();
-        mBluetoothAdapter.stopLeScan(mJellyBeanScanCallback);
+        if(mBluetoothAdapter!=null) {
+            mBluetoothAdapter.stopLeScan(mJellyBeanScanCallback);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
-    public void startScan() {
+    public boolean startScan() {
         isScanning = true;
-        mBluetoothAdapter.startLeScan(mJellyBeanScanCallback);
+        if(mBluetoothAdapter!=null) {
+            mBluetoothAdapter.startLeScan(mJellyBeanScanCallback);
+            return true;
+        }else{
+            return false;
+        }
     }
 
 

@@ -1,4 +1,20 @@
 <resources>
+
     <string name="app_name">BLESupportConnector</string>
-    <string name="title_activity_list_peripherals">ListPeripherals</string>
+
+    <string name="title_activity_list_peripherals">List of devices</string>
+    <string name="title_activity_detail_peripheral">Connect</string>
+
+    <string name="connect">Connect</string>
+    <string name="rssi_value">Rssi : %1$d</string>
+
+
+
+    <string name="dialog_requirements_bluetooth_title">Bluetooth is off</string>
+    <string name="dialog_requirements_location_title">Location is disabled</string>
+    <string name="dialog_requirements_bluetooth_message">Bluetooth is required for detecting peripherals nearby</string>
+    <string name="dialog_requirements_location_message">Location services is required for detecting peripherals nearby</string>
+    <string name="dialog_requirements_cancel">Cancel</string>
+    <string name="dialog_requirements_activate">Activate</string>
+
 </resources>

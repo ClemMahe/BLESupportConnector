@@ -1,13 +1,17 @@
 package com.clemmahe.bluetoothconnectorlibrary.scanner;
 
 import android.bluetooth.BluetoothDevice;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.List;
 
 /**
  * BluetoothCompatDevice element
  * Created by clem on 24/11/2016.
  */
 
-public class BluetoothCompatDevice {
+public class BluetoothCompatDevice implements Comparable<BluetoothCompatDevice>, Parcelable {
 
     private BluetoothDevice mBluetoothDevice;
     private int mPeripheralRssi;
@@ -48,4 +52,60 @@ public class BluetoothCompatDevice {
     public void setPeripheralRecord(byte[] mPeripheralRecord) {
         this.mPeripheralRecord = mPeripheralRecord;
     }
+
+
+    @Override
+    public String toString() {
+        String stringObject = super.toString();
+        if(mBluetoothDevice.getAddress()!=null){
+            stringObject = mBluetoothDevice.getAddress();
+        }
+        return stringObject;
+    }
+
+
+
+    public static BluetoothCompatDevice searchObjectInListWithMacAddress(final List<BluetoothCompatDevice> list, BluetoothCompatDevice deviceToFind){
+        BluetoothCompatDevice res = null;
+        try{
+            for(BluetoothCompatDevice device : list){
+                if(device.getBluetoothDevice().getAddress().equals(deviceToFind.getBluetoothDevice().getAddress())){
+                    res = device;
+                    break;
+                }
+            }
+        }catch(NullPointerException e){
+            //Some objects are null and should not be
+        }
+        return res;
+    }
+
+
+    @Override
+    public int compareTo(BluetoothCompatDevice bluetoothCompatDevice) {
+        int res = 0;
+        try{
+            res = this.getBluetoothDevice().getAddress().compareTo(bluetoothCompatDevice.getBluetoothDevice().getAddress());
+        }catch(NullPointerException e){
+            //Some objects is null
+        }
+        return res;
+    }
+
+
+    //Parcelable is efficient when sending objects from activity to another
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeParcelable(mBluetoothDevice,flags);
+        parcel.writeInt(mPeripheralRssi);
+        parcel.writeByteArray(mPeripheralRecord);
+    }
+
+
 }

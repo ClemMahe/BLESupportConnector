@@ -5,15 +5,11 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
-import org.droidparts.Injector;
-import org.droidparts.annotation.inject.InjectDependency;
-
 import java.util.UUID;
 
 public class GattSetNotificationOperation extends GattOperation {
 
-    @InjectDependency
-    GattManager mGattManager;
+
 
     private final UUID mServiceUuid;
     private final UUID mCharacteristicUuid;
@@ -21,7 +17,6 @@ public class GattSetNotificationOperation extends GattOperation {
 
     public GattSetNotificationOperation(BluetoothDevice device, UUID serviceUuid, UUID characteristicUuid, UUID descriptorUuid) {
         super(device);
-        Injector.inject(Injector.getApplicationContext(), this);
         mServiceUuid = serviceUuid;
         mCharacteristicUuid = characteristicUuid;
         mDescriptorUuid = descriptorUuid;

@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattDescriptor;
 
-import org.droidparts.util.L;
+import com.clemmahe.bluetoothconnectorlibrary.logger.Logger;
 
 import java.util.UUID;
 
@@ -23,7 +23,7 @@ public class GattDescriptorWriteOperation extends GattOperation {
 
     @Override
     public void execute(BluetoothGatt gatt) {
-        L.d("Writing to " + mDescriptor);
+        Logger.d("Writing to " + mDescriptor);
         BluetoothGattDescriptor descriptor = gatt.getService(mService).getCharacteristic(mCharacteristic).getDescriptor(mDescriptor);
         gatt.writeDescriptor(descriptor);
     }

@@ -56,12 +56,12 @@ public abstract class CompatScanner {
     /**
      * Stop scan method
      */
-    abstract protected void stopScan();
+    abstract protected boolean stopScan();
 
     /**
      * Stop scan method
      */
-    abstract protected void startScan();
+    abstract protected boolean startScan();
 
 
     /**

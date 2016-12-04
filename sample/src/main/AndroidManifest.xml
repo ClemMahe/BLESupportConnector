@@ -11,14 +11,19 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".sample.ListPeripherals"
-            android:label="@string/title_activity_list_peripherals"
+            android:name=".sample.ListPeripheralsActivity"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".sample.DetailPeripheralActivity"
+            android:label="@string/title_activity_detail_peripheral"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
 

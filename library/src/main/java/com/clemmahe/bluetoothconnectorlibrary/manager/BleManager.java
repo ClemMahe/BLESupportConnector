@@ -20,11 +20,28 @@ public class BleManager{
     private GattManager mGattManager;
 
 
+    //Instance
+    private static BleManager instance;
+
+
+    /**
+     * Get instance
+     * @param context Context
+     * @return BleManager
+     */
+    public static BleManager getInstance(final Context context){
+        if(instance==null){
+            instance = new BleManager(context);
+        }
+        return instance;
+    }
+
+
     /**
      * Constructor
      * @param context Context
      */
-    public BleManager(final Context context) {
+    private BleManager(final Context context) {
         this.mContext = context;
         this.mCompatScanner = CompatScanner.getInstance(mContext);
         this.mGattManager = new GattManager(mContext);
@@ -55,6 +72,15 @@ public class BleManager{
         this.mGattManager.connectGatt(device,connectionListener);
     }
 
-
-
+    /**
+     * Finish operations
+     */
+    public void finish() {
+        if(this.mCompatScanner!=null){
+            this.mCompatScanner.stopCompatScan();
+        }
+        if(this.mGattManager!=null) {
+            this.mGattManager.disconnectGatt();
+        }
+    }
 }

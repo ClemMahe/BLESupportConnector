@@ -28,25 +28,35 @@ public class LollipopScanner extends CompatScanner{
      */
     protected LollipopScanner(Context context) {
         super(context);
-        this.mScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        if(mBluetoothAdapter!=null) {
+            this.mScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        }
     }
 
     @Override
-    public void stopScan() {
-        isScanning = false;
-        mScanner.stopScan(mLollipopScanCallback);
+    public boolean stopScan() {
+        if(mScanner!=null) {
+            isScanning = false;
+            mScanner.stopScan(mLollipopScanCallback);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     @Override
-    public void startScan() {
-        isScanning = true;
-
-        List<ScanFilter> filters = new ArrayList<>();
-        ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
-        scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_OPPORTUNISTIC);
-        ScanSettings scanSettings = scanSettingsBuilder.build();
-
-        mScanner.startScan(filters, scanSettings, mLollipopScanCallback);
+    public boolean startScan() {
+        if(mScanner!=null) {
+            isScanning = true;
+            List<ScanFilter> filters = new ArrayList<>();
+            ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
+            scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_OPPORTUNISTIC);
+            ScanSettings scanSettings = scanSettingsBuilder.build();
+            mScanner.startScan(filters, scanSettings, mLollipopScanCallback);
+            return true;
+        }else{
+            return false;
+        }
     }
 
 
@@ -57,11 +67,17 @@ public class LollipopScanner extends CompatScanner{
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
+            BluetoothCompatDevice device = new BluetoothCompatDevice(result.getDevice(), result.getRssi(), result.getScanRecord().getBytes());
+            mScanCallback.onDeviceFound(device);
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             super.onBatchScanResults(results);
+            for(ScanResult scanResult : results){
+                BluetoothCompatDevice device = new BluetoothCompatDevice(scanResult.getDevice(), scanResult.getRssi(), scanResult.getScanRecord().getBytes());
+                mScanCallback.onDeviceFound(device);
+            }
         }
 
         @Override

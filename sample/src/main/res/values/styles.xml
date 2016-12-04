@@ -13,6 +13,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorAlertDialogAccent</item>
+        <item name="android:textColorPrimary">@color/colorWhiteish</item>
+        <item name="android:background">@color/colorAlertDialogBackground</item>
+    </style>
+
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

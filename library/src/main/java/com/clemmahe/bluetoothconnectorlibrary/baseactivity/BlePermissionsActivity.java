@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -27,22 +26,19 @@ public abstract class BlePermissionsActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSION_COARSE = 1;
 
-    private static final int REQUIREMENTS_OK = -1;
-    private static final int REQUIREMENTS_ISSUE_PERMISSION_NOT_ALLOWED = 0;
-    private static final int REQUIREMENTS_ISSUE_SETTINGS_LOCATION_NOT_ACTIVATED = 1;
-    private static final int REQUIREMENTS_ISSUE_SETTINGS_BLUETOOTH_NOT_ACTIVATED = 2;
-    private static final int REQUIREMENTS_ISSUE_SETTINGS_LOCATION_AND_BLUETOOTH_NOT_ACTIVATED = 3;
+    public static final int REQUEST_SETTINGS_BLUETOOTH = 2;
+    public static final int REQUEST_SETTINGS_LOCATION = 3;
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        stepCheckPermission();
-    }
+    public static final int REQUIREMENTS_OK = -1;
+    public static final int REQUIREMENTS_ISSUE_PERMISSION_NOT_ALLOWED = 0;
+    public static final int REQUIREMENTS_ISSUE_SETTINGS_LOCATION_NOT_ACTIVATED = 1;
+    public static final int REQUIREMENTS_ISSUE_SETTINGS_BLUETOOTH_NOT_ACTIVATED = 2;
+    public static final int REQUIREMENTS_ISSUE_SETTINGS_LOCATION_AND_BLUETOOTH_NOT_ACTIVATED = 3;
 
     @Override
     protected void onResume() {
         super.onResume();
+        stepCheckPermission();
         registerReceiver(mBluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
         registerReceiver(mGpsReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
     }
@@ -55,7 +51,7 @@ public abstract class BlePermissionsActivity extends AppCompatActivity {
     }
 
     /**
-     * AppBluetoothReady
+     * AppBluetoothReady - Called in onResume after "stepCheckPermission"
      */
     protected abstract void appBluetoothReady(boolean ready, int status);
 
@@ -115,6 +111,18 @@ public abstract class BlePermissionsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case REQUEST_SETTINGS_BLUETOOTH:
+                stepCheckAllStates();
+                break;
+            case REQUEST_SETTINGS_LOCATION:
+                stepCheckAllStates();
+                break;
+        }
+    }
 
     /**
      * Check Bluetooth enabled
@@ -182,6 +190,7 @@ public abstract class BlePermissionsActivity extends AppCompatActivity {
             }
         }
     };
+
 
 
 }
