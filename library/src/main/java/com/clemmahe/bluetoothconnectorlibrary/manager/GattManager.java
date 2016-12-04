@@ -30,9 +30,6 @@ public class GattManager {
     //Single Gatt instance at any time
     private static BluetoothGatt mGatt;
 
-    //Single instance of GattCallback
-    private static BluetoothGattCallback mGattCallback;
-
     //Listeners
     private static IConnectionListener mConnectionListener;
 
@@ -58,11 +55,10 @@ public class GattManager {
             @Override
             public void run() {
                 mConnectionListener = connectionListener;
-                mGatt = device.getBluetoothDevice().connectGatt(mContext, false, mGattCallback);
+                mGatt = device.getBluetoothDevice().connectGatt(mContext, false, mGattManagerCallback);
             }
         });
     }
-
 
     /**
      * Disconnect Gatt

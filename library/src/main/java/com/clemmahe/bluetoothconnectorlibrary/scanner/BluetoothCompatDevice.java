@@ -13,6 +13,8 @@ import java.util.List;
 
 public class BluetoothCompatDevice implements Comparable<BluetoothCompatDevice>, Parcelable {
 
+    public static final String INTENT_KEY_BLUETOOTHCOMPATDEVICE = "INTENT_BLEDEVICE";
+
     private BluetoothDevice mBluetoothDevice;
     private int mPeripheralRssi;
     private byte[] mPeripheralRecord;
@@ -28,6 +30,28 @@ public class BluetoothCompatDevice implements Comparable<BluetoothCompatDevice>,
         this.mPeripheralRssi = rssi;
         this.mPeripheralRecord = record;
     }
+
+    /**
+     * Parcelable instanciation
+     * @param in Parcel
+     */
+    protected BluetoothCompatDevice(Parcel in) {
+        mBluetoothDevice = in.readParcelable(BluetoothDevice.class.getClassLoader());
+        mPeripheralRssi = in.readInt();
+        mPeripheralRecord = in.createByteArray();
+    }
+
+    public static final Creator<BluetoothCompatDevice> CREATOR = new Creator<BluetoothCompatDevice>() {
+        @Override
+        public BluetoothCompatDevice createFromParcel(Parcel in) {
+            return new BluetoothCompatDevice(in);
+        }
+
+        @Override
+        public BluetoothCompatDevice[] newArray(int size) {
+            return new BluetoothCompatDevice[size];
+        }
+    };
 
     public BluetoothDevice getBluetoothDevice() {
         return mBluetoothDevice;

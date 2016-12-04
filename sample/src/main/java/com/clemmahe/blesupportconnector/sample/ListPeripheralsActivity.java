@@ -47,7 +47,6 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
     //Scanner
     private BleManager bleManager;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +54,13 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        initAdapter();
 
-        //Default app name
-        toolbar.setTitle(getString(R.string.title_activity_list_peripherals));
+        //Show icon
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+
+        //Init adapter
+        initAdapter();
     }
 
 
@@ -75,7 +77,6 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
         } else {
             //Bluetoothadapter should not be null now
             bleManager = BleManager.getInstance(getApplicationContext());
-            mListDevices.clear();
             startScan();
         }
     }
@@ -102,7 +103,8 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
         recyclerviewListdevicesList.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new PeripheralsAdapter(mListDevices);
+        mAdapter = new PeripheralsAdapter(mListDevices,adapterListener);
+
         recyclerviewListdevicesList.setAdapter(mAdapter);
     }
 
@@ -190,6 +192,20 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
     };
 
 
+    /**
+     * Adapter listener
+     */
+    private PeripheralsAdapter.IRecyclerAdapterConnectListener adapterListener = new PeripheralsAdapter.IRecyclerAdapterConnectListener() {
+        @Override
+        public void onClickConnect(BluetoothCompatDevice device) {
+            //Either connect or call a new activity... in my case i open a new activity
+            //The SDK will prevent you from connecting multiple times, if you click multiple times on a button...
+            Intent startDetailPeripheral = new Intent(ListPeripheralsActivity.this, DetailPeripheralActivity.class);
+            startDetailPeripheral.putExtra(BluetoothCompatDevice.INTENT_KEY_BLUETOOTHCOMPATDEVICE,device);
+            startActivity(startDetailPeripheral);
+        }
+    };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -212,15 +228,16 @@ public class ListPeripheralsActivity extends BlePermissionsActivity {
             d.setBluetoothDevice(device.getBluetoothDevice());
             d.setPeripheralRssi(device.getPeripheralRssi());
             d.setPeripheralRecord(device.getPeripheralRecord());
+
+            //!! RSSI will not be updated each time, because we don't call notifyDataSetChanged any time, it would be called to often
         } else {
+
             mListDevices.add(device);
+            //Sort by name
+            Collections.sort(mListDevices);
+            mAdapter.notifyDataSetChanged();
         }
 
-        //Sort by RSSI
-        Collections.sort(mListDevices);
-
-        //Update list
-        mAdapter.notifyDataSetChanged();
     }
 
 

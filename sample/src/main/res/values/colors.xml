@@ -7,11 +7,14 @@
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorAccent">@color/colorWhiteish</color>
 
-
+    <!--Listperipheral-->
     <color name="colorAlertDialogBackground">#0D47A1</color>
     <color name="colorAlertDialogAccent">@color/colorWhiteish</color>
-
     <color name="colorCardViewBackground">#90CAF9</color>
 
+    <!--DetailPeripheral-->
+    <color name="colorDetailPeripheralStateBackgroundWaiting">#CCC</color>
+    <color name="colorDetailPeripheralStateBackgroundOk">#69F0AE</color>
+    <color name="colorDetailPeripheralStateBackgroundError">#FF6E40</color>
 
 </resources>

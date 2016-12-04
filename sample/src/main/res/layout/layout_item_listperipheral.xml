@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:padding="20dp"
             android:layout_height="wrap_content"
-            android:text="@string/title_activity_detail_peripheral"
+            android:text="@string/listperipheral_item_connect"
             android:layout_alignParentRight="true"
             style="@style/Widget.AppCompat.Button"
             android:backgroundTint="@color/colorPrimary"

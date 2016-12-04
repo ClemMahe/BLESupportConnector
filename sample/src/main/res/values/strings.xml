@@ -3,12 +3,12 @@
     <string name="app_name">BLESupportConnector</string>
 
     <string name="title_activity_list_peripherals">List of devices</string>
-    <string name="title_activity_detail_peripheral">Connect</string>
-
-    <string name="connect">Connect</string>
-    <string name="rssi_value">Rssi : %1$d</string>
+    <string name="title_activity_detail_peripheral">Peripheral : %1$s</string>
 
 
+
+    <!--List peripherals-->
+    <string name="listperipheral_item_connect">Connect</string>
 
     <string name="dialog_requirements_bluetooth_title">Bluetooth is off</string>
     <string name="dialog_requirements_location_title">Location is disabled</string>
@@ -17,4 +17,12 @@
     <string name="dialog_requirements_cancel">Cancel</string>
     <string name="dialog_requirements_activate">Activate</string>
 
+    <!--Detail device-->
+    <string name="detailperipheral_status_waiting">Waiting...</string>
+    <string name="detailperipheral_status_null">Device cannot be found</string>
+    <string name="detailperipheral_status_connecting">Connecting...</string>
+    <string name="detailperipheral_status_connected">Connected !</string>
+    <string name="detailperipheral_status_servicediscovered">Service discovered, peripheral ready.</string>
+    <string name="detailperipheral_status_disconnected">Disconnected</string>
+    <string name="detailperipheral_status_disconnecting">Disconnecting...</string>
 </resources>

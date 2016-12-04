@@ -22,7 +22,6 @@
 
         <activity
             android:name=".sample.DetailPeripheralActivity"
-            android:label="@string/title_activity_detail_peripheral"
             android:theme="@style/AppTheme.NoActionBar"/>
 
     </application>
