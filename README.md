@@ -100,6 +100,8 @@ private IConnectionListener mConnectionListener = new IConnectionListener() {
 
 A sample app is included as a module of the project.
 
+<img src="/screenshots/listactivity.png?raw=true" width="200"/>
+
 ## Issue 
 
 If you have any issue, don't hesitate to create tickets. If its related to scanning peripherals I may not have any solution.
