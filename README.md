@@ -7,11 +7,17 @@ Workarounds (:sigh:) included :
 
 Be sure to "stop" scan only when you don't need it anymore. If you stop scan too early before beeing connected, you may not be able to connect on some phone. For example, it will be working on N5X/S6/S7 but won't work at all on Samsung A3/A5.
 
+## Base activity
+
+If your activity is focused on Bluetootk tasks, you may inherit your activity (or base activity) from <b>BlePermissionsActivity</b>, that will help you find out if Bluetooth is enabled & if location services are enabled (required if targetSDK>=21)
+
 ## Usage
 
-When Bluetooh is ready : 
 
 1) Instanciate BleManager 
+
+Get instance of BleManager when Bluetooh is ready. Either on "onResume" after checking if permissions & settings have been enabled.
+If you inherit from <b>BlePermissionsActivity</b>, you can call it inside <b>appBluetoothReady(boolean ready, int status)</b> method, if ready.
 
 ```java 
 BleManager bleManager = BleManager.getInstance(getApplicationContext());
@@ -89,10 +95,6 @@ private IConnectionListener mConnectionListener = new IConnectionListener() {
     }
 };
 ```
-
-## Custom activity
-
-If your activity is focused on Bluetootk tasks, you may inherit your activity (or base activity) from <b>BlePermissionsActivity</b>, that will help you find out if Bluetooth is enabled & if location services are enabled (required if targetSDK>=21)
 
 ## Sample 
 
