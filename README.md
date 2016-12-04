@@ -1,5 +1,5 @@
 # BLESupportConnector
-Working recently on a BLE project, and facing problems with Android BLE stack, this project goal is to includes all needed workarounds (I definitively hate this word) to assure compatibility towards Android 4.4 to Android 7.1. It also provide a manager class which will handle GATT call on Uithread, and manage instance of scanner & listeners.
+Working recently on a BLE project, and facing problems with Android BLE stack, this project goal is to includes all needed workarounds (I definitively hate this word) to assure compatibility towards Android 4.4 to Android 7.1. It also provide a manager class which will handle GATT calls on Uithread, and manage instance of scanner & listeners.
 
 Workarounds (:sigh:) included :
 - On disconnection, call Gatt method "refresh" before disconnecting & closing Gatt.
