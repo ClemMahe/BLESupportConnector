@@ -4,7 +4,11 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract CompatScanner
@@ -15,7 +19,6 @@ public abstract class CompatScanner {
 
 
     private Context mContext;
-    private Handler mScanHandler;
     private long mPeriodScan;
 
     protected BluetoothManager mBluetoothManager;
@@ -23,6 +26,12 @@ public abstract class CompatScanner {
     protected ScanCompatCallback mScanCallback;
 
     protected boolean isScanning;
+
+
+    //Scheduler
+    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledFuture<?> taskScan;
+
 
 
     /**
@@ -33,7 +42,7 @@ public abstract class CompatScanner {
         this.mContext = context;
         this.mBluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);
         this.mBluetoothAdapter = this.mBluetoothManager.getAdapter();
-        this.mScanHandler = new Handler();
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(1);
     }
 
 
@@ -73,37 +82,57 @@ public abstract class CompatScanner {
         //Start scan
         this.mPeriodScan = periodScanMs;
         this.mScanCallback = callback;
-
-        if(!isScanning) {
-            this.startScan();
-            this.mScanHandler.post(scanRunnable);
-        }
-    }
-
-
-    public void stopCompatScan(){
-        //Stop scan
-        this.mScanHandler.removeCallbacks(scanRunnable);
-        stopScan();
+        this.isScanning = true;
+        startScanTask();
     }
 
 
     /**
-     * Scan runnable
+     * Stop compat scan
      */
-    private Runnable scanRunnable = new Runnable() {
+    public void stopCompatScan(){
+        isScanning = false;
+        if(mScanCallback!=null){
+            mScanCallback.onScanEnded();
+        }
+        stopScanIfCan();
+    }
+
+    /**
+     * Start scan task
+     */
+    private void startScanTask(){
+        stopScanIfCan();
+        taskScan = scheduledExecutorService.
+                scheduleAtFixedRate(stopStartScanRunnable, 50, mPeriodScan, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Stop scan if i can
+     */
+    private void stopScanIfCan(){
+        if(taskScan!=null && !taskScan.isCancelled()){
+            taskScan.cancel(true);
+        }
+        if(mBluetoothAdapter!=null) {
+            stopScan();
+        }
+    }
+
+
+    /**
+     * Stop & startScan (called periodically)
+     */
+    private Runnable stopStartScanRunnable = new Runnable() {
         @Override
         public void run() {
-            startScan();
-            mScanHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    stopScan();
-                    mScanHandler.post(scanRunnable);
-                }
-            },mPeriodScan);
+            if(mBluetoothAdapter!=null){
+                stopScan();
+                startScan();
+            }
         }
     };
+
 
     /**
      * Get Scanning status
@@ -113,11 +142,5 @@ public abstract class CompatScanner {
         return isScanning;
     }
 
-    /**
-     * Set Scanning
-     * @param scanning boolean
-     */
-    protected void setScanning(boolean scanning) {
-        isScanning = scanning;
-    }
+
 }
