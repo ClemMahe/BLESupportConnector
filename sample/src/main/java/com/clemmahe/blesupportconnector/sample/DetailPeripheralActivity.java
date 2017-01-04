@@ -67,7 +67,7 @@ public class DetailPeripheralActivity extends BlePermissionsActivity {
      */
     private void connectGatt() {
         if (mDevice != null) {
-            bleManager.connectToDevice(mDevice, mConnectionListener);
+            bleManager.connectToDevice(mDevice, mConnectionListener, 60000);
         }else{
             showStateError(R.string.detailperipheral_status_null);
         }

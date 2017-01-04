@@ -1,6 +1,7 @@
 package com.clemmahe.bluetoothconnectorlibrary.manager;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.clemmahe.bluetoothconnectorlibrary.scanner.BluetoothCompatDevice;
 import com.clemmahe.bluetoothconnectorlibrary.scanner.CompatScanner;
@@ -22,6 +23,9 @@ public class BleManager{
 
     //Instance
     private static BleManager instance;
+
+    //Handler in current thread (uithread or not)
+    private Handler mHandler;
 
 
     /**
@@ -45,6 +49,7 @@ public class BleManager{
         this.mContext = context;
         this.mCompatScanner = CompatScanner.getInstance(mContext);
         this.mGattManager = new GattManager(mContext);
+        this.mHandler = new Handler();
     }
 
     /**
@@ -69,7 +74,20 @@ public class BleManager{
      * @param deviceConnect BluetoothCompatDevice
      * @param connectionListener IConnectionListener
      */
-    public void connectToDevice(final BluetoothCompatDevice deviceConnect, final IConnectionListener connectionListener){
+    public void connectToDevice(final BluetoothCompatDevice deviceConnect,
+                                final IConnectionListener connectionListener,
+                                final long timeoutMs){
+
+        //Cannot connect
+        this.mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mCompatScanner.stopCompatScan();
+                connectionListener.onError();
+            }
+        },timeoutMs);
+
+        //Start compat scan
         this.mCompatScanner.startCompatScan(new ScanCompatCallback() {
             boolean found = false;
             @Override
@@ -85,15 +103,11 @@ public class BleManager{
             }
             @Override
             public void onScanFailed() {
-                if(!found) {
-                    connectionListener.onError();
-                }
+                //Scan failed - as there will be multiple scans done, no need for callbacks
             }
             @Override
             public void onScanEnded() {
-                if(!found) {
-                    connectionListener.onError();
-                }
+                //Scan ended - as there will be multiple scans done, no need for callbacks
             }
         }, DEFAULT_SCAN_PERIOD);
     }
