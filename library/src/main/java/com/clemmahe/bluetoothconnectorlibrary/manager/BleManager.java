@@ -66,10 +66,36 @@ public class BleManager{
 
     /**
      * Connect to device
-     * @param device
+     * @param deviceConnect BluetoothCompatDevice
+     * @param connectionListener IConnectionListener
      */
-    public void connectToDevice(final BluetoothCompatDevice device, final IConnectionListener connectionListener){
-        this.mGattManager.connectGatt(device,connectionListener);
+    public void connectToDevice(final BluetoothCompatDevice deviceConnect, final IConnectionListener connectionListener){
+        this.mCompatScanner.startCompatScan(new ScanCompatCallback() {
+            boolean found = false;
+            @Override
+            public void onDeviceFound(BluetoothCompatDevice deviceFound) {
+                try {
+                    if (deviceConnect.getBluetoothDevice().getAddress().equals(deviceFound.getBluetoothDevice().getAddress())) {
+                        found = true;
+                        mGattManager.connectGatt(deviceFound, connectionListener);
+                    }
+                }catch(NullPointerException e){
+                    //Ignore onDeviceFound if device found has null address or null BLEdevice
+                }
+            }
+            @Override
+            public void onScanFailed() {
+                if(!found) {
+                    connectionListener.onError();
+                }
+            }
+            @Override
+            public void onScanEnded() {
+                if(!found) {
+                    connectionListener.onError();
+                }
+            }
+        }, DEFAULT_SCAN_PERIOD);
     }
 
     /**

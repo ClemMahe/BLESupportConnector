@@ -17,4 +17,6 @@ public interface IConnectionListener {
 
     void onServicesDiscovered();
 
+    void onError();
+
 }

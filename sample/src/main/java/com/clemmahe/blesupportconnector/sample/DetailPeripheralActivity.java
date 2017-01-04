@@ -126,6 +126,11 @@ public class DetailPeripheralActivity extends BlePermissionsActivity {
         public void onServicesDiscovered() {
             showStateOk(R.string.detailperipheral_status_servicediscovered);
         }
+
+        @Override
+        public void onError() {
+            showStateError(R.string.detailperipheral_status_disconnected);
+        }
     };
 
     /**

@@ -3,7 +3,6 @@ package com.clemmahe.bluetoothconnectorlibrary.scanner;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
-import android.os.Build;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,12 +51,14 @@ public abstract class CompatScanner {
      * @return CompatScanner
      */
     public static CompatScanner getInstance(final Context context){
-        CompatScanner instance = null;
+        CompatScanner instance = new JellyBeanScanner(context);
+        //Jellybeanscanner works better
+        /*
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             instance = new LollipopScanner(context);
         }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2){
-            instance = new JellyBeanScanner(context);
-        }
+            instance
+        }*/
         return instance;
     }
 
