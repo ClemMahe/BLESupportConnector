@@ -1,18 +1,28 @@
 package com.clemmahe.bluetoothconnectorlibrary.manager;
 
+import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.clemmahe.bluetoothconnectorlibrary.BuildConfig;
 import com.clemmahe.bluetoothconnectorlibrary.logger.Logger;
 import com.clemmahe.bluetoothconnectorlibrary.scanner.BluetoothCompatDevice;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
 /**
  * Handles gatt calls on UiThread
@@ -50,14 +60,101 @@ public class GattManager {
      * @param device BluetoothCompatDevice
      * @param connectionListener IConnectionListener
      */
-    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener){
+    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener, final boolean autoConnect){
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
                 mConnectionListener = connectionListener;
-                mGatt = device.getBluetoothDevice().connectGatt(mContext, false, mGattManagerCallback);
+                if (device == null && connectionListener!=null) {
+                    mConnectionListener.onError();
+                }else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || !autoConnect) {
+                        connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), autoConnect);
+                    }else {
+                        try {
+                            Object iBluetoothGatt = getIBluetoothGatt(getIBluetoothManager());
+                            if (iBluetoothGatt == null) {
+                                connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                            }else {
+                                BluetoothGatt bluetoothGatt = createBluetoothGatt(iBluetoothGatt, device.getBluetoothDevice());
+                                if (bluetoothGatt == null) {
+                                    connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                                }else{
+                                    boolean connectedSuccessfully = connectUsingReflection(bluetoothGatt, mGattManagerCallback, true);
+                                    if (!connectedSuccessfully) {
+                                        bluetoothGatt.close();
+                                        connectionListener.onError();
+                                    }
+                                }
+                            }
+                        } catch (NoSuchMethodException
+                                | IllegalAccessException
+                                | IllegalArgumentException
+                                | InvocationTargetException
+                                | InstantiationException
+                                | NoSuchFieldException exception) {
+                            connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                        }
+                        mConnectionListener = connectionListener;
+                        mGatt = device.getBluetoothDevice().connectGatt(mContext, true, mGattManagerCallback);
+                    }
+                }
             }
         });
+    }
+
+    //Connnect gatt compat
+    private boolean connectUsingReflection(BluetoothGatt bluetoothGatt, BluetoothGattCallback bluetoothGattCallback, boolean autoConnect)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+        setAutoConnectValue(bluetoothGatt, autoConnect);
+        Method connectMethod = bluetoothGatt.getClass().getDeclaredMethod("connect", Boolean.class, BluetoothGattCallback.class);
+        connectMethod.setAccessible(true);
+        return (Boolean) (connectMethod.invoke(bluetoothGatt, true, bluetoothGattCallback));
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private BluetoothGatt createBluetoothGatt(Object iBluetoothGatt, BluetoothDevice remoteDevice)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor bluetoothGattConstructor = BluetoothGatt.class.getDeclaredConstructors()[0];
+        bluetoothGattConstructor.setAccessible(true);
+        if (bluetoothGattConstructor.getParameterTypes().length == 4) {
+            return (BluetoothGatt) (bluetoothGattConstructor.newInstance(mContext, iBluetoothGatt, remoteDevice, TRANSPORT_LE));
+        } else {
+            return (BluetoothGatt) (bluetoothGattConstructor.newInstance(mContext, iBluetoothGatt, remoteDevice));
+        }
+    }
+    private BluetoothGatt connectGattCompat(BluetoothGattCallback bluetoothGattCallback, BluetoothDevice device, boolean autoConnect) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return device.connectGatt(mContext, autoConnect, bluetoothGattCallback, TRANSPORT_LE);
+        } else {
+            return device.connectGatt(mContext, autoConnect, bluetoothGattCallback);
+        }
+    }
+    private Object getIBluetoothGatt(Object iBluetoothManager)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (iBluetoothManager == null) {
+            return null;
+        }
+        Method getBluetoothGattMethod = getMethodFromClass(iBluetoothManager.getClass(), "getBluetoothGatt");
+        return getBluetoothGattMethod.invoke(iBluetoothManager);
+    }
+    private Method getMethodFromClass(Class<?> cls, String methodName) throws NoSuchMethodException {
+        Method method = cls.getDeclaredMethod(methodName);
+        method.setAccessible(true);
+        return method;
+    }
+    private Object getIBluetoothManager() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            return null;
+        }
+        Method getBluetoothManagerMethod = getMethodFromClass(bluetoothAdapter.getClass(), "getBluetoothManager");
+        return getBluetoothManagerMethod.invoke(bluetoothAdapter);
+    }
+    private void setAutoConnectValue(BluetoothGatt bluetoothGatt, boolean autoConnect) throws NoSuchFieldException, IllegalAccessException {
+        Field autoConnectField = bluetoothGatt.getClass().getDeclaredField("mAutoConnect");
+        autoConnectField.setAccessible(true);
+        autoConnectField.setBoolean(bluetoothGatt, autoConnect);
     }
 
     /**
@@ -100,7 +197,7 @@ public class GattManager {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
 
-            Logger.w("GattManager.onConnectionStateChange : Status:"+status+", NewState:"+newState);
+            Logger.d("GattManager onConnectionStateChange : Status:"+status+", NewState:"+newState);
 
             //Connection state
             if(newState == BluetoothProfile.STATE_CONNECTING){

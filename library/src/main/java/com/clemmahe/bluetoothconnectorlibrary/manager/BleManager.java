@@ -68,8 +68,10 @@ public class BleManager{
      * Connect to device
      * @param device
      */
-    public void connectToDevice(final BluetoothCompatDevice device, final IConnectionListener connectionListener){
-        this.mGattManager.connectGatt(device,connectionListener);
+    public void connectToDevice(final BluetoothCompatDevice device,
+                                final IConnectionListener connectionListener,
+                                final boolean autoConnect){
+        this.mGattManager.connectGatt(device,connectionListener, autoConnect);
     }
 
     /**

@@ -12,28 +12,28 @@ import com.clemmahe.bluetoothconnectorlibrary.BuildConfig;
 public class Logger{
 
     private static final String TAG = "BluetoothConnector";
-
+    public static boolean DISPLAY_LOGS = true;
 
     public static void d(String message){
-        if(BuildConfig.DEBUG) {
+        if(DISPLAY_LOGS) {
             Log.d(TAG, message);
         }
     }
 
     public static void e(String message){
-        if(BuildConfig.DEBUG) {
+        if(DISPLAY_LOGS) {
             Log.e(TAG, message);
         }
     }
 
     public static void v(String message){
-        if(BuildConfig.DEBUG) {
+        if(DISPLAY_LOGS) {
             Log.v(TAG, message);
         }
     }
 
     public static void w(String message){
-        if(BuildConfig.DEBUG) {
+        if(DISPLAY_LOGS) {
             Log.w(TAG, message);
         }
     }

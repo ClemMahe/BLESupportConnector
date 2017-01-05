@@ -67,7 +67,7 @@ public class DetailPeripheralActivity extends BlePermissionsActivity {
      */
     private void connectGatt() {
         if (mDevice != null) {
-            bleManager.connectToDevice(mDevice, mConnectionListener);
+            bleManager.connectToDevice(mDevice, mConnectionListener, true);
         }else{
             showStateError(R.string.detailperipheral_status_null);
         }
@@ -122,6 +122,11 @@ public class DetailPeripheralActivity extends BlePermissionsActivity {
         @Override
         public void onServicesDiscovered() {
             showStateOk(R.string.detailperipheral_status_servicediscovered);
+        }
+
+        @Override
+        public void onError() {
+            showStateError(R.string.detailperipheral_status_disconnected);
         }
     };
 
