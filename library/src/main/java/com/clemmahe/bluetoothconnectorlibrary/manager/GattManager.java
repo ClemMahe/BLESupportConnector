@@ -54,35 +54,44 @@ public class GattManager {
         this.uiHandler = new Handler(Looper.getMainLooper());
     }
 
-
-    /**
-     * Connect Gatt
-     * @param device BluetoothCompatDevice
-     * @param connectionListener IConnectionListener
-     */
-    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener, final boolean autoConnect){
+    /*
+    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener, final boolean autoConnect) {
         uiHandler.post(new Runnable() {
             @Override
             public void run() {
                 mConnectionListener = connectionListener;
+                mGatt = device.getBluetoothDevice().connectGatt(mContext, true, mGattManagerCallback);
+            }
+        });
+    }
+    */
+
+
+    public void connectGatt(final BluetoothCompatDevice device, final IConnectionListener connectionListener, final boolean autoConnect){
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+
+                mConnectionListener = connectionListener;
+
                 if (device == null && connectionListener!=null) {
                     mConnectionListener.onError();
                 }else {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || !autoConnect) {
-                        connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), autoConnect);
+                        mGatt = connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), autoConnect);
                     }else {
                         try {
                             Object iBluetoothGatt = getIBluetoothGatt(getIBluetoothManager());
                             if (iBluetoothGatt == null) {
-                                connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                                mGatt = connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
                             }else {
-                                BluetoothGatt bluetoothGatt = createBluetoothGatt(iBluetoothGatt, device.getBluetoothDevice());
-                                if (bluetoothGatt == null) {
-                                    connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                                mGatt = createBluetoothGatt(iBluetoothGatt, device.getBluetoothDevice());
+                                if (mGatt == null) {
+                                    mGatt = connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
                                 }else{
-                                    boolean connectedSuccessfully = connectUsingReflection(bluetoothGatt, mGattManagerCallback, true);
+                                    boolean connectedSuccessfully = connectUsingReflection(mGatt, mGattManagerCallback, true);
                                     if (!connectedSuccessfully) {
-                                        bluetoothGatt.close();
+                                        mGatt.close();
                                         connectionListener.onError();
                                     }
                                 }
@@ -93,15 +102,14 @@ public class GattManager {
                                 | InvocationTargetException
                                 | InstantiationException
                                 | NoSuchFieldException exception) {
-                            connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
+                            mGatt = connectGattCompat(mGattManagerCallback, device.getBluetoothDevice(), true);
                         }
-                        mConnectionListener = connectionListener;
-                        mGatt = device.getBluetoothDevice().connectGatt(mContext, true, mGattManagerCallback);
                     }
                 }
             }
         });
     }
+
 
     //Connnect gatt compat
     private boolean connectUsingReflection(BluetoothGatt bluetoothGatt, BluetoothGattCallback bluetoothGattCallback, boolean autoConnect)
@@ -211,6 +219,7 @@ public class GattManager {
             }else if(newState == BluetoothProfile.STATE_DISCONNECTING){
                 if(mConnectionListener!=null) mConnectionListener.onDisconnecting();
                 isConnected = false;
+                mGatt.close();
             }else if(newState == BluetoothProfile.STATE_DISCONNECTED){
                 if(mConnectionListener!=null) mConnectionListener.onDisconnected();
                 //Assure if isConnected that gatt is disconnected
