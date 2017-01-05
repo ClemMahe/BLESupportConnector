@@ -43,12 +43,15 @@ public abstract class CompatScanner {
      * @return CompatScanner
      */
     public static CompatScanner getInstance(final Context context){
-        CompatScanner instance = null;
+        CompatScanner instance = new JellyBeanScanner(context);
+
+        /*
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             instance = new LollipopScanner(context);
         }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2){
             instance = new JellyBeanScanner(context);
         }
+        */
         return instance;
     }
 

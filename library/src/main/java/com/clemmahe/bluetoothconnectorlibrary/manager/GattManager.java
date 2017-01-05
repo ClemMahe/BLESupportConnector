@@ -100,6 +100,8 @@ public class GattManager {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
 
+            Logger.w("GattManager.onConnectionStateChange : Status:"+status+", NewState:"+newState);
+
             //Connection state
             if(newState == BluetoothProfile.STATE_CONNECTING){
                 if(mConnectionListener!=null) mConnectionListener.onConnecting();
