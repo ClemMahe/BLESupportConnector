@@ -79,14 +79,11 @@ public class DetailPeripheralActivity extends BlePermissionsActivity {
         }
     }
 
-
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         disconnectGatt();
-        super.onDestroy();
+        super.onStop();
     }
-
-
 
     @Override
     protected void appBluetoothReady(boolean ready, int status) {
